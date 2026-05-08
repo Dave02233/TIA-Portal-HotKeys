@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <title>Hotkey Launcher</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      color: #e5e7eb;
+      background: radial-gradient(circle at top left, #1f2937, #020617 55%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.85));
+      border-radius: 24px;
+      border: 1px solid rgba(148,163,184,0.4);
+      box-shadow:
+        0 32px 80px rgba(15,23,42,0.8),
+        0 0 0 1px rgba(15,23,42,1);
+      padding: 2.2rem 2.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(56,189,248,0.18), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(147,197,253,0.12), transparent 55%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .inner {
+      position: relative;
+      z-index: 1;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.95);
+      color: #9ca3af;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.9rem;
+    }
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #f97316;
+      box-shadow: 0 0 0 6px rgba(248, 113, 113, 0.2);
+    }
+    h1 {
+      font-size: 2.1rem;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.5rem;
+    }
+    h1 span {
+      color: #f97316;
+    }
+    p.subtitle {
+      font-size: 0.95rem;
+      color: #9ca3af;
+      max-width: 30rem;
+      margin-bottom: 1.6rem;
+    }
+    .shortcut {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      background: rgba(15,23,42,1);
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 1.4rem;
+    }
+    .shortcut kbd {
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.4rem;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: #020617;
+      font-size: 0.75rem;
+      color: #e5e7eb;
+      box-shadow: 0 2px 0 rgba(15,23,42,0.8);
+    }
+    .actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    button.primary {
+      border: none;
+      padding: 0.7rem 1.8rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f97316, #fb923c);
+      color: #111827;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      box-shadow:
+        0 12px 30px rgba(248,113,113,0.5),
+        0 0 0 1px rgba(15,23,42,0.9);
+      transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+    }
+    button.primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow:
+        0 16px 40px rgba(248,113,113,0.6),
+        0 0 0 1px rgba(15,23,42,0.9);
+    }
+    button.primary:active {
+      transform: translateY(1px);
+      box-shadow:
+        0 8px 20px rgba(248,113,113,0.4),
+        0 0 0 1px rgba(15,23,42,0.9);
+    }
+    button.secondary {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.6rem 1.2rem;
+      background: rgba(15,23,42,0.92);
+      color: #9ca3af;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    button.secondary kbd {
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.4rem;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: #020617;
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+    small.hint {
+      display: block;
+      margin-top: 0.9rem;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="inner">
+      <div class="pill">
+        <span class="pill-dot"></span>
+        <span>Sessione TIA Portal</span>
+      </div>
+      <h1>Chiudi la finestra<br><span>con un solo click</span>.</h1>
+      <p class="subtitle">
+        Metti in primo piano la finestra che vuoi chiudere, poi usa questo launcher per inviare 
+        la combinazione <strong>Alt + F4</strong> in modo automatico.
+      </p>
+
+      <div class="shortcut">
+        <span>Scorciatoia configurata</span>
+        <kbd>Alt</kbd><span>+</span><kbd>F4</kbd>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="fire-hotkey">
+          <span>⚡</span>
+          <span>Invia Alt + F4</span>
+        </button>
+        <button class="secondary" disabled>
+          <span>Assicurati che la finestra sia attiva</span>
+          <kbd>Alt + Tab</kbd>
+        </button>
+      </div>
+
+      <small class="hint">
+        Suggerimento: prova prima su una finestra innocua (Blocco note, browser, ecc.) per confermare 
+        che la combinazione funzioni come ti aspetti.
+      </small>
+    </div>
+  </div>
+
+  <script>
+    const keys = require('./build/Release/keyaddon.node');
+    const btn = document.getElementById('fire-hotkey');
+
+    btn.addEventListener('click', () => {
+      keys.sendCombo(['alt', 'f4'], 150);
+    });
+  </script>
+</body>
+</html>

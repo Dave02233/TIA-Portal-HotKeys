@@ -4,15 +4,20 @@ const keys = require('./build/Release/keyaddon.node');
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
+    width: 900,
     height: 600,
+    backgroundColor: '#020617',
+    webPreferences: {
+      nodeIntegration: true,      // per usare require nel renderer
+      contextIsolation: false
+    }
   });
 
-  win.loadURL('https://example.com'); // o un file locale
-
-  setTimeout(() => {
-    keys.sendCombo(['alt', 'f1'], 200);
-  }, 3000);
+  win.loadFile('index.html');
 }
 
 app.whenReady().then(createWindow);
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
