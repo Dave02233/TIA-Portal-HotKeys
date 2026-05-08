@@ -25,39 +25,6 @@ typedef struct tagINPUT              // definisco una struct chiamata internamen
 } INPUT;                             // alias "INPUT" per questa struct (così scrivi INPUT invece di struct tagINPUT
 */  
 
-
-void SendAltF1ToForeground() {
-    INPUT ip;
-    ZeroMemory(&ip, sizeof(INPUT));
-    ip.type = INPUT_KEYBOARD;
-    ip.ki.wScan = 0;
-    ip.ki.time = 0;
-    ip.ki.dwExtraInfo = 0;
-
-    // 1) Ctrl down
-    ip.ki.wVk = VK_LMENU;
-    ip.ki.dwFlags = 0;                // keydown
-    SendInput(1, &ip, sizeof(INPUT));
-
-    // 2) F2 down
-    ip.ki.wVk = VK_F1;
-    ip.ki.dwFlags = 0;                // keydown
-    SendInput(1, &ip, sizeof(INPUT));
-
-    Sleep(1000);
-
-    // 3) F2 up
-    ip.ki.wVk = VK_F1;
-    ip.ki.dwFlags = KEYEVENTF_KEYUP;  // keyup
-    SendInput(1, &ip, sizeof(INPUT));
-
-    // 4) Ctrl up
-    ip.ki.wVk = VK_LMENU;
-    ip.ki.dwFlags = KEYEVENTF_KEYUP;  // keyup
-    SendInput(1, &ip, sizeof(INPUT));
-}
-
-
 WORD VkFromName(const std::string& name) {
     
     if (name == "ctrl")  return VK_CONTROL;   
@@ -81,21 +48,52 @@ WORD VkFromName(const std::string& name) {
 }
 
 
-void sendKey(std::string& key) {
+void sendKey(const std::string& key, bool dir = false) { //dir = false down, true up 
     WORD vk = VkFromName(key);
+    if(vk == 0) {
+        std::cerr << "Comando non valido" << std::endl;
+        return;
+    }
 
-    
+    INPUT ip;
+    ZeroMemory(&ip, sizeof(ip));
+    ip.type = INPUT_KEYBOARD;
+    ip.ki.wScan = 0;
+    ip.ki.time = 0;
+    ip.ki.dwExtraInfo = 0;
+
+    ip.ki.wVk = vk;
+    if(dir == 0) {
+        ip.ki.dwFlags = 0; 
+    } else {
+        ip.ki.dwFlags = KEYEVENTF_KEYUP;
+    }
+
+    SendInput(1, &ip, sizeof(INPUT));
 }
 
-void sendCombo(std::vector<std::string>& keys) {
-    
+void sendCombo(const std::vector<std::string>& keys, unsigned int keyUpTime = 1000) {
+    for(const std::string& k : keys) {
+        sendKey(k, false);
+    }
+
+    Sleep(keyUpTime);
+
+    for(const std::string& k : keys) {
+        sendKey(k, true);
+    }
+}
+
+void test() {
+    std::vector<std::string> keyList = {"alt", "f1"};
+    sendCombo(keyList, 1000);
 }
 
 
 int main() {
     std::cout << "Launching keys..." << std::endl; 
 
-    SendAltF1ToForeground();
+    test();
 
     std::cout << "Keys launched" << std::endl;
     return 0;
