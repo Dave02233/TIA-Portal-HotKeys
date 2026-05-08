@@ -2,211 +2,277 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <title>Hotkey Launcher</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      color: #e5e7eb;
-      background: radial-gradient(circle at top left, #1f2937, #020617 55%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-    .card {
-      width: 100%;
-      max-width: 520px;
-      background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.85));
-      border-radius: 24px;
-      border: 1px solid rgba(148,163,184,0.4);
-      box-shadow:
-        0 32px 80px rgba(15,23,42,0.8),
-        0 0 0 1px rgba(15,23,42,1);
-      padding: 2.2rem 2.4rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(56,189,248,0.18), transparent 55%),
-        radial-gradient(circle at 100% 100%, rgba(147,197,253,0.12), transparent 55%);
-      mix-blend-mode: screen;
-      pointer-events: none;
-    }
-    .inner {
-      position: relative;
-      z-index: 1;
-    }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.3rem 0.9rem;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.5);
-      background: rgba(15,23,42,0.95);
-      color: #9ca3af;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 0.9rem;
-    }
-    .pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #f97316;
-      box-shadow: 0 0 0 6px rgba(248, 113, 113, 0.2);
-    }
-    h1 {
-      font-size: 2.1rem;
-      line-height: 1.1;
-      letter-spacing: -0.04em;
-      margin-bottom: 0.5rem;
-    }
-    h1 span {
-      color: #f97316;
-    }
-    p.subtitle {
-      font-size: 0.95rem;
-      color: #9ca3af;
-      max-width: 30rem;
-      margin-bottom: 1.6rem;
-    }
-    .shortcut {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.4rem 0.9rem;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.4);
-      background: rgba(15,23,42,1);
-      font-size: 0.8rem;
-      color: #9ca3af;
-      margin-bottom: 1.4rem;
-    }
-    .shortcut kbd {
-      padding: 0.25rem 0.6rem;
-      border-radius: 0.4rem;
-      border: 1px solid rgba(148,163,184,0.5);
-      background: #020617;
-      font-size: 0.75rem;
-      color: #e5e7eb;
-      box-shadow: 0 2px 0 rgba(15,23,42,0.8);
-    }
-    .actions {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    button.primary {
-      border: none;
-      padding: 0.7rem 1.8rem;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #f97316, #fb923c);
-      color: #111827;
-      font-size: 0.95rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      box-shadow:
-        0 12px 30px rgba(248,113,113,0.5),
-        0 0 0 1px rgba(15,23,42,0.9);
-      transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
-    }
-    button.primary:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
-      box-shadow:
-        0 16px 40px rgba(248,113,113,0.6),
-        0 0 0 1px rgba(15,23,42,0.9);
-    }
-    button.primary:active {
-      transform: translateY(1px);
-      box-shadow:
-        0 8px 20px rgba(248,113,113,0.4),
-        0 0 0 1px rgba(15,23,42,0.9);
-    }
-    button.secondary {
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.5);
-      padding: 0.6rem 1.2rem;
-      background: rgba(15,23,42,0.92);
-      color: #9ca3af;
-      font-size: 0.85rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    button.secondary kbd {
-      padding: 0.2rem 0.5rem;
-      border-radius: 0.4rem;
-      border: 1px solid rgba(148,163,184,0.5);
-      background: #020617;
-      font-size: 0.7rem;
-      color: #9ca3af;
-    }
-    small.hint {
-      display: block;
-      margin-top: 0.9rem;
-      font-size: 0.8rem;
-      color: #6b7280;
-    }
-  </style>
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+  <title>TIA Hotkey Launcher</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="card">
-    <div class="inner">
-      <div class="pill">
-        <span class="pill-dot"></span>
-        <span>Sessione TIA Portal</span>
-      </div>
-      <h1>Chiudi la finestra<br><span>con un solo click</span>.</h1>
-      <p class="subtitle">
-        Metti in primo piano la finestra che vuoi chiudere, poi usa questo launcher per inviare 
-        la combinazione <strong>Alt + F4</strong> in modo automatico.
-      </p>
+  <div class="shell">
 
-      <div class="shortcut">
-        <span>Scorciatoia configurata</span>
-        <kbd>Alt</kbd><span>+</span><kbd>F4</kbd>
-      </div>
+    <div class="card">
+      <div class="card__inner">
 
-      <div class="actions">
-        <button class="primary" id="fire-hotkey">
-          <span>⚡</span>
-          <span>Invia Alt + F4</span>
-        </button>
-        <button class="secondary" disabled>
-          <span>Assicurati che la finestra sia attiva</span>
-          <kbd>Alt + Tab</kbd>
-        </button>
-      </div>
+        <div class="pill">
+          <span class="pill__dot"></span>
+          <span>TIA Portal Ladder Helper</span>
+        </div>
 
-      <small class="hint">
-        Suggerimento: prova prima su una finestra innocua (Blocco note, browser, ecc.) per confermare 
-        che la combinazione funzioni come ti aspetti.
-      </small>
+        <h1>Disegna ladder<br><span class="accent">solo con la tastiera</span>.</h1>
+        <p class="subtitle">
+          Definisci i tasti rapidi locali e abilita il listener.
+          Quando attivo, ogni tasto locale invia automaticamente la scorciatoia TIA corrispondente.
+        </p>
+
+        <table class="actions-table" aria-label="Tabella azioni ladder">
+          <thead>
+            <tr>
+              <th>Azione</th>
+              <th>Binding TIA (default)</th>
+              <th>Tasto locale</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-name">Contatto aperto</td>
+              <td class="col-binding"><span class="binding-val" data-action="open"></span></td>
+              <td class="col-hotkey"><input id="hk-open"   type="text" value="c"         maxlength="20"></td>
+            </tr>
+            <tr>
+              <td class="col-name">Contatto chiuso</td>
+              <td class="col-binding"><span class="binding-val" data-action="closed"></span></td>
+              <td class="col-hotkey"><input id="hk-closed" type="text" value="d"         maxlength="20"></td>
+            </tr>
+            <tr>
+              <td class="col-name">Bobina</td>
+              <td class="col-binding"><span class="binding-val" data-action="coil"></span></td>
+              <td class="col-hotkey"><input id="hk-coil"   type="text" value="o"         maxlength="20"></td>
+            </tr>
+            <tr>
+              <td class="col-name">Funzione</td>
+              <td class="col-binding"><span class="binding-val" data-action="func"></span></td>
+              <td class="col-hotkey"><input id="hk-func"   type="text" value="f"         maxlength="20"></td>
+            </tr>
+            <tr>
+              <td class="col-name">Linea su</td>
+              <td class="col-binding"><span class="binding-val" data-action="up"></span></td>
+              <td class="col-hotkey"><input id="hk-up"     type="text" value="ArrowUp"   maxlength="20"></td>
+            </tr>
+            <tr>
+              <td class="col-name">Linea giù</td>
+              <td class="col-binding"><span class="binding-val" data-action="down"></span></td>
+              <td class="col-hotkey"><input id="hk-down"   type="text" value="ArrowDown" maxlength="20"></td>
+            </tr>
+            <!-- separatore macro -->
+            <tr>
+              <td colspan="3" style="
+                padding: 0.6rem 0 0.3rem 0;
+                font-size: 0.72rem;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                color: #6b7280;
+                border-bottom: 1px solid rgba(148,163,184,0.15);
+              ">Macro</td>
+            </tr>
+            <tr>
+              <td class="col-name" style="color:#f97316;">Contatti paralleli</td>
+              <td class="col-binding" style="font-size:0.72rem; color:#6b7280; font-style:italic;">
+                open → ← ↓ open ↑ →
+              </td>
+              <td class="col-hotkey"><input id="hk-w" type="text" value="w" maxlength="20"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="toggle-section">
+          <div class="toggle-wrap">
+            <span class="toggle-label" id="toggle-label">Stato: Disabilitato</span>
+            <div class="toggle-btn" id="toggle-btn"
+                 role="switch" aria-checked="false"
+                 aria-label="Abilita listener hotkey"
+                 tabindex="0"></div>
+          </div>
+          <p class="toggle-hint">
+            Quando <strong>abilitato</strong>, i tasti locali inviano le scorciatoie TIA
+            alla finestra attiva tramite SendInput.
+          </p>
+        </div>
+
+        <div class="trigger-row">
+          <label for="toggle-key">Tasto toggle:</label>
+          <input id="toggle-key" type="text" value="CapsLock" maxlength="30"
+                 placeholder="es. CapsLock, F9…">
+          <span style="font-size:0.75rem; color:#6b7280;">
+            Premi questo tasto ovunque per attivare/disattivare
+          </span>
+        </div>
+
+      </div>
     </div>
+
+    <div class="card card--right">
+      <div class="card__inner">
+
+        <div class="sidebar-section">
+          <div class="sidebar-title">Come si usa</div>
+          <div class="sidebar-box">
+            <strong>1.</strong> Metti TIA Portal in primo piano.<br>
+            <strong>2.</strong> Verifica i binding nella colonna centrale rispetto alla tabella di TIA.<br>
+            <strong>3.</strong> Abilita il listener con il toggle o con il tasto configurato.<br>
+            <strong>4.</strong> Premi i tasti locali: vengono mandati automaticamente i binding TIA.
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-title">Tasti locali di default</div>
+          <div class="sidebar-box">
+            <ul>
+              <li><span class="kbd">c</span><span class="arrow">→</span>Contatto aperto</li>
+              <li><span class="kbd">d</span><span class="arrow">→</span>Contatto chiuso</li>
+              <li><span class="kbd">o</span><span class="arrow">→</span>Bobina</li>
+              <li><span class="kbd">f</span><span class="arrow">→</span>Funzione</li>
+              <li><span class="kbd">↑ ArrowUp</span><span class="arrow">→</span>Linea su</li>
+              <li><span class="kbd">↓ ArrowDown</span><span class="arrow">→</span>Linea giù</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <div class="status-dot" id="status-dot"></div>
+          <span id="status-text">Listener disattivo</span>
+        </div>
+
+      </div>
+    </div>
+
   </div>
+<script>
+  const keysAddon = require('./build/Release/keyaddon.node');
 
-  <script>
-    const keys = require('./build/Release/keyaddon.node');
-    const btn = document.getElementById('fire-hotkey');
+  const TIA_BINDINGS = {
+    open:   ['ctrl','f11'],
+    closed: ['ctrl','f12'],
+    coil:   ['ctrl','shift','f11'],
+    func:   ['ctrl','shift','f12'],
+    up:     ['ctrl','arrowup'],
+    down:   ['ctrl','arrowdown'],
+    left:   ['arrowleft'],
+    right:  ['arrowright']
+  };
 
-    btn.addEventListener('click', () => {
-      keys.sendCombo(['alt', 'f4'], 150);
+  function comboLabel(arr) {
+    return arr.map(k => {
+      if (k === 'arrowup')    return '↑';
+      if (k === 'arrowdown')  return '↓';
+      if (k === 'arrowleft')  return '←';
+      if (k === 'arrowright') return '→';
+      return k.charAt(0).toUpperCase() + k.slice(1);
+    }).join('+');
+  }
+
+  function refreshBindingLabels() {
+    document.querySelectorAll('.binding-val').forEach(el => {
+      const action = el.dataset.action;
+      if (TIA_BINDINGS[action]) el.textContent = comboLabel(TIA_BINDINGS[action]);
     });
-  </script>
+  }
+
+  refreshBindingLabels();
+
+  // Esegue una sequenza di binding TIA con delay tra ogni combo
+  function sendSequence(actions, delayMs = 120) {
+    return actions.reduce((chain, action) => {
+      return chain.then(() => new Promise(resolve => {
+        const binding = TIA_BINDINGS[action];
+        if (Array.isArray(binding) && binding.length > 0) {
+          keysAddon.sendCombo(binding, 80);
+        }
+        setTimeout(resolve, delayMs);
+      }));
+    }, Promise.resolve());
+  }
+
+  // Macro definite come array di azioni
+  const MACROS = {
+    w: {
+      label: 'Contatti paralleli',
+      sequence: ['open','left','down','open','up','right']
+    }
+  };
+
+  const hkInputs = {
+    open:   document.getElementById('hk-open'),
+    closed: document.getElementById('hk-closed'),
+    coil:   document.getElementById('hk-coil'),
+    func:   document.getElementById('hk-func'),
+    up:     document.getElementById('hk-up'),
+    down:   document.getElementById('hk-down'),
+    w:      document.getElementById('hk-w')
+  };
+
+  function getLocalMap() {
+    const map = {};
+    for (const [action, el] of Object.entries(hkInputs)) {
+      const k = (el.value || '').trim();
+      if (k) map[k] = action;
+    }
+    return map;
+  }
+
+  let enabled = false;
+  const toggleBtn      = document.getElementById('toggle-btn');
+  const toggleLabel    = document.getElementById('toggle-label');
+  const statusDot      = document.getElementById('status-dot');
+  const statusText     = document.getElementById('status-text');
+  const toggleKeyInput = document.getElementById('toggle-key');
+
+  function setEnabled(on) {
+    enabled = on;
+    toggleBtn.classList.toggle('on', on);
+    toggleBtn.setAttribute('aria-checked', String(on));
+    toggleLabel.textContent = on ? 'Stato: Abilitato' : 'Stato: Disabilitato';
+    statusDot.classList.toggle('active', on);
+    statusText.textContent = on
+      ? 'Listener attivo — in ascolto sui tasti locali'
+      : 'Listener disattivo — nessun tasto intercettato';
+  }
+
+  toggleBtn.addEventListener('click', () => setEnabled(!enabled));
+  toggleBtn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setEnabled(!enabled); }
+  });
+
+  document.addEventListener('keydown', ev => {
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+    const toggleKey = (toggleKeyInput.value || 'CapsLock').trim();
+    if (ev.key === toggleKey) {
+      ev.preventDefault();
+      setEnabled(!enabled);
+      return;
+    }
+
+    if (!enabled) return;
+
+    const localMap = getLocalMap();
+    const action = localMap[ev.key] || localMap[ev.code];
+    if (!action) return;
+
+    ev.preventDefault();
+
+    // Macro: sequenza di azioni
+    if (MACROS[action]) {
+      sendSequence(MACROS[action].sequence);
+      return;
+    }
+
+    // Singola azione
+    const binding = TIA_BINDINGS[action];
+    if (Array.isArray(binding) && binding.length > 0) {
+      keysAddon.sendCombo(binding, 80);
+    }
+  });
+</script>
 </body>
 </html>
