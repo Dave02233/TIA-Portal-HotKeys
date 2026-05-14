@@ -1,21 +1,55 @@
 {
-  "name": "electronapp",
+  "name": "tia-hotkey-launcher",
   "version": "1.0.0",
-  "description": "",
+  "description": "Hotkey launcher per TIA Portal",
   "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
-  },
-  "keywords": [],
-  "author": "",
+  "author": "Davide Cannistraro",
   "license": "ISC",
   "type": "commonjs",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "electron-builder install-app-deps",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "win": "electron-builder --win nsis"
+  },
   "devDependencies": {
-    "electron": "^42.0.0"
+    "electron": "^42.0.0",
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
     "node-addon-api": "^8.7.0"
   },
-  "gypfile": true
+  "gypfile": true,
+  "build": {
+    "appId": "com.davide.tiahotkeylauncher",
+    "productName": "TIA Hotkey Launcher",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "index.html",
+      "style.css",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "build/Release/*.node"
+    ],
+    "nodeGypRebuild": true,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
 }
