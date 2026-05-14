@@ -147,7 +147,7 @@
 
   </div>
 <script>
-  const keysAddon = require('./build/Release/keyaddon.node');
+  const { ipcRenderer } = require('electron');
 
   const TIA_BINDINGS = {
     open:   ['ctrl','f11'],
@@ -179,17 +179,15 @@
 
   refreshBindingLabels();
 
-  // Esegue una sequenza di binding TIA con delay tra ogni combo
-  function sendSequence(actions, delayMs = 120) {
-    return actions.reduce((chain, action) => {
-      return chain.then(() => new Promise(resolve => {
-        const binding = TIA_BINDINGS[action];
-        if (Array.isArray(binding) && binding.length > 0) {
-          keysAddon.sendCombo(binding, 80);
-        }
-        setTimeout(resolve, delayMs);
-      }));
-    }, Promise.resolve());
+  // Comunica le mappature e richieste di toggle al processo main
+  function sendUpdate(enabled = false) {
+    ipcRenderer.send('update-shortcuts', {
+      localMap: getLocalMap(),
+      tiaBindings: TIA_BINDINGS,
+      macros: MACROS,
+      toggleKey: (toggleKeyInput.value || 'CapsLock').trim(),
+      enabled
+    });
   }
 
   // Macro definite come array di azioni
@@ -236,43 +234,22 @@
       ? 'Listener attivo — in ascolto sui tasti locali'
       : 'Listener disattivo — nessun tasto intercettato';
   }
-
-  toggleBtn.addEventListener('click', () => setEnabled(!enabled));
+  toggleBtn.addEventListener('click', () => {
+    ipcRenderer.send('toggle-request');
+  });
   toggleBtn.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setEnabled(!enabled); }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ipcRenderer.send('toggle-request'); }
   });
 
-  document.addEventListener('keydown', ev => {
-    const tag = document.activeElement && document.activeElement.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  // invia aggiornamenti quando cambiano gli input
+  Object.values(hkInputs).forEach(el => el.addEventListener('change', () => sendUpdate(enabled)));
+  toggleKeyInput.addEventListener('change', () => sendUpdate(enabled));
 
-    const toggleKey = (toggleKeyInput.value || 'CapsLock').trim();
-    if (ev.key === toggleKey) {
-      ev.preventDefault();
-      setEnabled(!enabled);
-      return;
-    }
+  // riceve stato abilitazione dal main
+  ipcRenderer.on('enabled-changed', (evt, on) => setEnabled(on));
 
-    if (!enabled) return;
-
-    const localMap = getLocalMap();
-    const action = localMap[ev.key] || localMap[ev.code];
-    if (!action) return;
-
-    ev.preventDefault();
-
-    // Macro: sequenza di azioni
-    if (MACROS[action]) {
-      sendSequence(MACROS[action].sequence);
-      return;
-    }
-
-    // Singola azione
-    const binding = TIA_BINDINGS[action];
-    if (Array.isArray(binding) && binding.length > 0) {
-      keysAddon.sendCombo(binding, 80);
-    }
-  });
+  // invio iniziale delle mappature al main
+  sendUpdate(false);
 </script>
 </body>
 </html>
