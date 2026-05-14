@@ -223,6 +223,55 @@
   const statusDot      = document.getElementById('status-dot');
   const statusText     = document.getElementById('status-text');
   const toggleKeyInput = document.getElementById('toggle-key');
+  let recordingToggle = false;
+
+  function startRecordingToggle() {
+    recordingToggle = true;
+    toggleKeyInput.placeholder = 'Premi un tasto o clicca il mouse...';
+    toggleKeyInput.classList.add('recording');
+    // attach temporary listeners
+    const onKey = (e) => {
+      e.preventDefault();
+      const val = e.key || e.code;
+      stopRecording(val);
+    };
+    const onMouse = (e) => {
+      e.preventDefault();
+      let val = 'Mouse';
+      if (e.button === 0) val = 'MouseLeft';
+      else if (e.button === 1) val = 'MouseMiddle';
+      else if (e.button === 2) val = 'MouseRight';
+      else val = 'MouseButton' + e.button;
+      stopRecording(val);
+    };
+    const onWheel = (e) => {
+      e.preventDefault();
+      const val = e.deltaY < 0 ? 'WheelUp' : 'WheelDown';
+      stopRecording(val);
+    };
+    document.addEventListener('keydown', onKey, { once: true });
+    document.addEventListener('mousedown', onMouse, { once: true });
+    document.addEventListener('wheel', onWheel, { once: true });
+    // store the handlers so we could remove them if needed
+    toggleKeyInput._recHandlers = { onKey, onMouse, onWheel };
+  }
+
+  function stopRecording(value) {
+    recordingToggle = false;
+    toggleKeyInput.classList.remove('recording');
+    if (toggleKeyInput._recHandlers) {
+      try { document.removeEventListener('keydown', toggleKeyInput._recHandlers.onKey); } catch (e) {}
+      try { document.removeEventListener('mousedown', toggleKeyInput._recHandlers.onMouse); } catch (e) {}
+      try { document.removeEventListener('wheel', toggleKeyInput._recHandlers.onWheel); } catch (e) {}
+      toggleKeyInput._recHandlers = null;
+    }
+    toggleKeyInput.placeholder = '';
+    if (value) {
+      toggleKeyInput.value = value;
+      // inform main about the changed toggle key
+      sendUpdate(enabled);
+    }
+  }
 
   function setEnabled(on) {
     enabled = on;
@@ -234,9 +283,7 @@
       ? 'Listener attivo — in ascolto sui tasti locali'
       : 'Listener disattivo — nessun tasto intercettato';
   }
-  toggleBtn.addEventListener('click', () => {
-    ipcRenderer.send('toggle-request');
-  });
+  toggleBtn.addEventListener('click', () => { ipcRenderer.send('toggle-request'); });
   toggleBtn.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ipcRenderer.send('toggle-request'); }
   });
@@ -244,6 +291,9 @@
   // invia aggiornamenti quando cambiano gli input
   Object.values(hkInputs).forEach(el => el.addEventListener('change', () => sendUpdate(enabled)));
   toggleKeyInput.addEventListener('change', () => sendUpdate(enabled));
+  // start recording when the input is focused or double-clicked
+  toggleKeyInput.addEventListener('focus', () => startRecordingToggle());
+  toggleKeyInput.addEventListener('dblclick', () => startRecordingToggle());
 
   // riceve stato abilitazione dal main
   ipcRenderer.on('enabled-changed', (evt, on) => setEnabled(on));

@@ -9,6 +9,7 @@ let currentLocalMap = {};
 let currentTIABindings = {};
 let currentMacros = {};
 let currentToggleKey = 'CapsLock';
+let previousToggleKey = null;
 const registeredActionKeys = new Set();
 
 function toAccelerator(key) {
@@ -60,13 +61,20 @@ function unregisterActionShortcuts() {
 }
 
 function registerToggleKey() {
+  try {
+    if (previousToggleKey && previousToggleKey !== currentToggleKey) {
+      globalShortcut.unregister(previousToggleKey);
+    }
+  } catch (e) {}
+
   try { globalShortcut.unregister(currentToggleKey); } catch (e) {}
   try {
-    globalShortcut.register(currentToggleKey, () => {
+    const ok = globalShortcut.register(currentToggleKey, () => {
       enabled = !enabled;
       if (enabled) registerActionShortcuts(); else unregisterActionShortcuts();
       if (win && win.webContents) win.webContents.send('enabled-changed', enabled);
     });
+    if (ok) previousToggleKey = currentToggleKey;
   } catch (e) {}
 }
 
