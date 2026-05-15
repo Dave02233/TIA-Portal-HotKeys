@@ -32,6 +32,7 @@
       "index.html",
       "style.css",
       "package.json",
+      "build/**/*",
       "node_modules/**/*"
     ],
     "asar": true,

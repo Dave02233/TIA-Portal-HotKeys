@@ -1,7 +1,11 @@
 const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
 const path = require('path');
 
-const keysAddon = require(path.join(__dirname, 'build', 'Release', 'keyaddon.node'));
+const addonPath = app.isPackaged
+  ? path.join(process.resourcesPath, 'app.asar.unpacked', 'build', 'Release', 'keyaddon.node')
+  : path.join(__dirname, 'build', 'Release', 'keyaddon.node');
+
+const keysAddon = require(addonPath);
 
 let win = null;
 let enabled = false;
