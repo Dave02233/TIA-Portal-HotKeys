@@ -35,22 +35,22 @@
             <tr>
               <td class="col-name">Contatto aperto</td>
               <td class="col-binding"><span class="binding-val" data-action="open"></span></td>
-              <td class="col-hotkey"><input id="hk-open"   type="text" value="c"         maxlength="20"></td>
+              <td class="col-hotkey"><input id="hk-open"   type="text" value="c"        maxlength="20"></td>
             </tr>
             <tr>
               <td class="col-name">Contatto chiuso</td>
               <td class="col-binding"><span class="binding-val" data-action="closed"></span></td>
-              <td class="col-hotkey"><input id="hk-closed" type="text" value="d"         maxlength="20"></td>
+              <td class="col-hotkey"><input id="hk-closed" type="text" value="d"       maxlength="20"></td>
             </tr>
             <tr>
               <td class="col-name">Bobina</td>
               <td class="col-binding"><span class="binding-val" data-action="coil"></span></td>
-              <td class="col-hotkey"><input id="hk-coil"   type="text" value="o"         maxlength="20"></td>
+              <td class="col-hotkey"><input id="hk-coil"   type="text" value="o"        maxlength="20"></td>
             </tr>
             <tr>
               <td class="col-name">Funzione</td>
               <td class="col-binding"><span class="binding-val" data-action="func"></span></td>
-              <td class="col-hotkey"><input id="hk-func"   type="text" value="f"         maxlength="20"></td>
+              <td class="col-hotkey"><input id="hk-func"   type="text" value="f"        maxlength="20"></td>
             </tr>
             <tr>
               <td class="col-name">Linea su</td>
@@ -150,14 +150,14 @@
   const { ipcRenderer } = require('electron');
 
   const TIA_BINDINGS = {
-    open:   ['ctrl','f11'],
-    closed: ['ctrl','f12'],
-    coil:   ['ctrl','shift','f11'],
-    func:   ['ctrl','shift','f12'],
-    up:     ['ctrl','arrowup'],
-    down:   ['ctrl','arrowdown'],
-    left:   ['arrowleft'],
-    right:  ['arrowright']
+    open:   ['f9'],           // Contatto aperto  → F9
+    closed: ['f10'],          // Contatto chiuso  → F10
+    coil:   ['shift', 'f7'],  // Bobina           → Shift+F7
+    func:   ['f8'],           // Funzione         → F8
+    up:     ['shift', 'f9'],  // Linea su         → Shift+F9
+    down:   ['shift', 'f8'],  // Linea giù        → Shift+F8
+    left:   ['arrowleft'],    // invariato (usato nelle macro)
+    right:  ['arrowright']    // invariato (usato nelle macro)
   };
 
   function comboLabel(arr) {
@@ -194,7 +194,7 @@
   const MACROS = {
     w: {
       label: 'Contatti paralleli',
-      sequence: ['open','left','down','open','up','right']
+      sequence: ['left','down','open','up','right']
     }
   };
 

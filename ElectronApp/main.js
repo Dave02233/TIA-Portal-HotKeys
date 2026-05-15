@@ -41,7 +41,7 @@ function registerActionShortcuts() {
     if (globalShortcut.isRegistered(acc)) continue;
     const cb = () => {
       const macro = currentMacros && currentMacros[action];
-      if (macro && Array.isArray(macro.sequence)) {
+      if (macro && Array.isArray(macro.sequence, 250)) {
         sendSequence(macro.sequence);
         return;
       }
