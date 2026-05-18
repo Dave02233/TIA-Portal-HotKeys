@@ -1,0 +1,1 @@
+Supporto per TIA V16-21, ora solo V20
