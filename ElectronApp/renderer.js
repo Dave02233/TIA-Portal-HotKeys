@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+console.log('[renderer] loaded');
 
 const TIA_BINDINGS = {
   open:   ['f9'],           // Contatto aperto  → F9
@@ -32,13 +33,15 @@ refreshBindingLabels();
 
 // Comunica le mappature e richieste di toggle al processo main
 function sendUpdate(enabled = false) {
-  ipcRenderer.send('update-shortcuts', {
+  const payload = {
     localMap: getLocalMap(),
     tiaBindings: TIA_BINDINGS,
     macros: MACROS,
     toggleKey: (toggleKeyInput.value || 'CapsLock').trim(),
     enabled
-  });
+  };
+  console.log('[renderer] sendUpdate', payload.enabled, payload.toggleKey, payload.localMap);
+  ipcRenderer.send('update-shortcuts', payload);
 }
 
 // Macro definite come array di azioni
@@ -138,6 +141,8 @@ toggleBtn.addEventListener('click', () => { ipcRenderer.send('toggle-request'); 
 toggleBtn.addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ipcRenderer.send('toggle-request'); }
 });
+// instrument toggle clicks
+toggleBtn.addEventListener('click', () => { console.log('[renderer] toggle click -> send toggle-request'); });
 
 // invia aggiornamenti quando cambiano gli input
 Object.values(hkInputs).forEach(el => el.addEventListener('change', () => sendUpdate(enabled)));
@@ -148,6 +153,9 @@ toggleKeyInput.addEventListener('dblclick', () => startRecordingToggle());
 
 // riceve stato abilitazione dal main
 ipcRenderer.on('enabled-changed', (evt, on) => setEnabled(on));
+
+// invio iniziale delle mappature al main
+ipcRenderer.on('enabled-changed', (evt, on) => { console.log('[renderer] enabled-changed', on); setEnabled(on); });
 
 // invio iniziale delle mappature al main
 sendUpdate(false);

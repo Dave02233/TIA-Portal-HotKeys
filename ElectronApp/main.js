@@ -5,7 +5,15 @@ const addonPath = app.isPackaged
   ? path.join(process.resourcesPath, 'app.asar.unpacked', 'build', 'Release', 'keyaddon.node')
   : path.join(__dirname, 'build', 'Release', 'keyaddon.node');
 
-const keysAddon = require(addonPath);
+let keysAddon;
+try {
+  keysAddon = require(addonPath);
+  console.log('[main] keysAddon loaded:', addonPath);
+} catch (e) {
+  console.error('[main] failed to load keysAddon:', addonPath, e);
+  // fallback stub so main process doesn't crash while debugging
+  keysAddon = { sendCombo: (...args) => console.warn('[main] stub sendCombo', args) };
+}
 
 let win = null;
 let enabled = false;
@@ -24,6 +32,7 @@ function toAccelerator(key) {
 }
 
 async function sendSequence(actions, delayMs = 120) {
+  console.log('[main] sendSequence', actions, delayMs);
   for (const action of actions) {
     const binding = currentTIABindings[action];
     if (Array.isArray(binding) && binding.length > 0) {
@@ -34,6 +43,7 @@ async function sendSequence(actions, delayMs = 120) {
 }
 
 function registerActionShortcuts() {
+  console.log('[main] registerActionShortcuts currentLocalMap=', currentLocalMap);
   unregisterActionShortcuts();
   for (const [localKey, action] of Object.entries(currentLocalMap || {})) {
     const acc = toAccelerator(localKey);
@@ -41,7 +51,7 @@ function registerActionShortcuts() {
     if (globalShortcut.isRegistered(acc)) continue;
     const cb = () => {
       const macro = currentMacros && currentMacros[action];
-      if (macro && Array.isArray(macro.sequence, 250)) {
+      if (macro && Array.isArray(macro.sequence)) {
         sendSequence(macro.sequence);
         return;
       }
@@ -52,37 +62,43 @@ function registerActionShortcuts() {
     };
     try {
       const ok = globalShortcut.register(acc, cb);
+      console.log('[main] registerActionShortcuts register', acc, 'for', action, 'ok=', ok);
       if (ok) registeredActionKeys.add(acc);
     } catch (e) {}
   }
 }
 
 function unregisterActionShortcuts() {
+  console.log('[main] unregisterActionShortcuts keys=', Array.from(registeredActionKeys));
   for (const acc of Array.from(registeredActionKeys)) {
-    try { globalShortcut.unregister(acc); } catch (e) {}
+    try { globalShortcut.unregister(acc); } catch (e) { console.error('[main] unregister error', e); }
     registeredActionKeys.delete(acc);
   }
 }
 
 function registerToggleKey() {
+  console.log('[main] registerToggleKey currentToggleKey=', currentToggleKey, 'previous=', previousToggleKey);
   try {
     if (previousToggleKey && previousToggleKey !== currentToggleKey) {
       globalShortcut.unregister(previousToggleKey);
     }
-  } catch (e) {}
+  } catch (e) { console.error('[main] unregister previous toggle key failed', e); }
 
-  try { globalShortcut.unregister(currentToggleKey); } catch (e) {}
+  try { globalShortcut.unregister(currentToggleKey); } catch (e) { /* ignore */ }
   try {
     const ok = globalShortcut.register(currentToggleKey, () => {
       enabled = !enabled;
+      console.log('[main] toggle shortcut pressed, enabled=', enabled);
       if (enabled) registerActionShortcuts(); else unregisterActionShortcuts();
       if (win && win.webContents) win.webContents.send('enabled-changed', enabled);
     });
+    console.log('[main] registerToggleKey result for', currentToggleKey, 'ok=', ok);
     if (ok) previousToggleKey = currentToggleKey;
-  } catch (e) {}
+  } catch (e) { console.error('[main] registerToggleKey error', e); }
 }
 
 function createWindow() {
+  console.log('[main] createWindow');
   win = new BrowserWindow({
     width: 1020,
     height: 660,
@@ -117,6 +133,7 @@ app.on('activate', () => {
 });
 
 ipcMain.on('update-shortcuts', (event, payload) => {
+  console.log('[main] ipc update-shortcuts', payload);
   currentLocalMap = payload.localMap || {};
   currentTIABindings = payload.tiaBindings || {};
   currentMacros = payload.macros || {};
@@ -133,7 +150,9 @@ ipcMain.on('update-shortcuts', (event, payload) => {
 });
 
 ipcMain.on('toggle-request', () => {
+  console.log('[main] ipc toggle-request received, enabled before=', enabled);
   enabled = !enabled;
+  console.log('[main] toggled enabled ->', enabled);
   if (enabled) registerActionShortcuts(); else unregisterActionShortcuts();
   if (win && win.webContents) win.webContents.send('enabled-changed', enabled);
 });

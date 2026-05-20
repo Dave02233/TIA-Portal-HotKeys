@@ -1,6 +1,6 @@
 {
   "name": "tia-hotkey-launcher",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Hotkey launcher per TIA Portal",
   "main": "main.js",
   "author": "Davide Cannistraro",
@@ -30,6 +30,7 @@
     "files": [
       "main.js",
       "index.html",
+      "renderer.js",
       "style.css",
       "package.json",
       "build/**/*",
